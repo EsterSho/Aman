@@ -11,8 +11,7 @@
         .controls { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
         input[type="number"] { width: 60px; background: #333; color: #fff; border: none; padding: 5px; text-align: center; }
         button { background: var(--accent); border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .set-btn { background: #333; margin: 5px 0; display: block; width: 100%; }
-        .active-set { background: var(--gold); color: #000; }
+        .set-btn { background: #333; margin: 5px 0; display: block; width: 100%; text-align: center; }
         .hidden { display: none; }
         .timer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--accent); color: #000; text-align: center; padding: 15px; font-weight: bold; font-size: 1.2rem; }
     </style>
@@ -39,7 +38,7 @@
                 </div>
                 <p>Повторы: 10-12</p>
                 <div id="content-${i}">
-                    ${[1,2,3,4].map(s => `<button class="set-btn" id="s-${i}-${s}" onclick="finishSet(${i}, ${s})">Подход ${s}</button>`).join('')}
+                    ${[1,2,3,4].map(s => `<button class="set-btn" id="s-${i}-${s}" onclick="finishSet(${i}, ${s})">Завершить ${s}-й подход</button>`).join('')}
                 </div>
             `;
             container.appendChild(div);
@@ -53,7 +52,7 @@
         function finishSet(i, s) {
             document.getElementById(`s-${i}-${s}`).classList.add('hidden');
             if (s < 4) {
-                runPrecisionTimer(60, () => document.getElementById(`s-${i}-${s+1}`).classList.add('active-set'));
+                runPrecisionTimer(60);
             } else {
                 let w = document.getElementById(`w-${i}`).value;
                 document.getElementById(`ex-${i}`).innerHTML = `<h3>${document.getElementById(`title-${i}`).innerText} | ${w} кг | ✅</h3>`;
@@ -61,23 +60,19 @@
             }
         }
 
-        // Таймер высокой точности
-        function runPrecisionTimer(sec, cb) {
+        function runPrecisionTimer(sec) {
             const bar = document.getElementById('timer-bar');
             const disp = document.getElementById('time-left');
             bar.classList.remove('hidden');
             
-            const start = Date.now();
-            const end = start + sec * 1000;
-
+            const end = Date.now() + sec * 1000;
             const int = setInterval(() => {
-                const remaining = Math.round((end - Date.now()) / 1000);
-                if (remaining < 0) {
+                const rem = Math.round((end - Date.now()) / 1000);
+                if (rem < 0) {
                     clearInterval(int);
                     bar.classList.add('hidden');
-                    if (cb) cb();
                 } else {
-                    disp.innerText = remaining;
+                    disp.innerText = rem;
                 }
             }, 100);
         }
