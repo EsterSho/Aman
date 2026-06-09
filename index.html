@@ -1,72 +1,590 @@
-<!DOCTYPE html>
+
+html = '''<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PUSH DAY AMAN</title>
     <style>
-        body { margin: 0; background: #111; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80'); background-size: cover; }
-        .stack { position: relative; width: 90%; max-width: 400px; margin-top: 50px; }
-        .card { 
-            position: absolute; top: 0; left: 0; width: 100%; 
-            background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; 
-            padding: 20px; transition: all 0.5s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            background: #111;
+            color: #fff;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overflow-x: hidden;
         }
-        .controls { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin: 15px 0; }
-        button { background: #00d4ff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .undo-btn { background: #ff4757; margin-top: 10px; color: white; width: 100%; }
-        .done { transform: translateY(20px) scale(0.95); opacity: 0.6; z-index: -1; }
+        
+        #title {
+            margin-top: 30px;
+            font-size: 1.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+            z-index: 100;
+        }
+        
+        .stack {
+            position: relative;
+            width: 90%;
+            max-width: 400px;
+            margin-top: 30px;
+            height: 500px;
+        }
+        
+        .card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 24px;
+            padding: 24px;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            transform-origin: center top;
+        }
+        
+        .card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 16px;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(0,0,0,0.25);
+            padding: 14px;
+            border-radius: 14px;
+            margin: 16px 0;
+        }
+        
+        .controls span {
+            font-size: 1.3rem;
+            font-weight: 700;
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .controls button {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+        
+        .controls button:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        
+        .controls button:active {
+            transform: scale(0.95);
+        }
+        
+        .info {
+            text-align: center;
+            font-size: 1rem;
+            opacity: 0.8;
+            margin: 12px 0;
+        }
+        
+        #main-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+            margin-top: 10px;
+            box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+        }
+        
+        #main-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,212,255,0.5);
+        }
+        
+        #main-btn:disabled {
+            background: linear-gradient(135deg, #ff6b35, #ff4757);
+            cursor: not-allowed;
+            box-shadow: 0 4px 20px rgba(255,107,53,0.3);
+        }
+        
+        .undo-btn {
+            background: linear-gradient(135deg, #ff4757, #cc0000);
+            border: none;
+            padding: 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            color: #fff;
+            text-transform: uppercase;
+            width: 100%;
+            margin-top: 10px;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 20px rgba(255,71,87,0.3);
+            transition: all 0.2s;
+        }
+        
+        .undo-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 25px rgba(255,71,87,0.5);
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card.done {
+            transform: translateY(60px) scale(0.92);
+            opacity: 0.35;
+            filter: grayscale(0.6);
+            pointer-events: none;
+        }
+        
+        .card.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+        
+        .card.future {
+            transform: translateY(30px) scale(0.96);
+            opacity: 0.5;
+        }
+        
+        /* LEGENDARY SCREEN */
+        #legendary {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        #legendary.show {
+            display: flex;
+        }
+        
+        #legendary h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            animation: pulse 1.5s ease infinite;
+            text-align: center;
+        }
+        
+        #legendary p {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            opacity: 0.7;
+            text-align: center;
+        }
+        
+        #legendary .next-unlock {
+            margin-top: 40px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* Day info */
+        .day-info {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+            text-align: center;
+        }
+        
+        .locked {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .locked.show {
+            display: flex;
+        }
+        
+        .locked h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        
+        .locked p {
+            opacity: 0.7;
+            font-size: 1.1rem;
+        }
     </style>
 </head>
 <body>
     <h1 id="title">PUSH DAY AMAN</h1>
+    <div class="day-info" id="day-info"></div>
     <div class="stack" id="stack"></div>
 
-    <script>
-        const exercises = ["Жим штанги лежа", "Жим гантелей сидя", "Брусья"];
-        let currentEx = 0;
-        let sets = 0;
-        let weight = 50;
+    <!-- LEGENDARY SCREEN -->
+    <div id="legendary">
+        <h1>LEGENDARY!</h1>
+        <p>Тренировка пройдена. Результаты зафиксированы.</p>
+        <p id="next-day-text"></p>
+        <button class="next-unlock" onclick="resetApp()">НАЧАТЬ ЗАНОВО (ДЕМО)</button>
+    </div>
 
+    <!-- LOCKED SCREEN -->
+    <div class="locked" id="locked">
+        <h2>🔒 ТРЕНИРОВКА ЗАБЛОКИРОВАНА</h2>
+        <p id="locked-reason"></p>
+    </div>
+
+    <script>
+        // ===================== STATE =====================
+        const STORAGE_KEY = 'pushDayAman_v1';
+        
+        // Default exercises with individual weights
+        const DEFAULT_EXERCISES = [
+            { name: "Жим штанги лежа", weight: 50 },
+            { name: "Жим гантелей сидя", weight: 20 },
+            { name: "Брусья", weight: 0 }
+        ];
+        
+        // Load or init state
+        function loadState() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return {
+                exercises: DEFAULT_EXERCISES.map(e => ({...e, setsDone: 0})),
+                currentEx: 0,
+                dayNumber: 1,
+                lastWorkoutEnd: null,
+                isFinished: false
+            };
+        }
+        
+        let state = loadState();
+        
+        // Runtime state (not saved)
+        let timerId = null;
+        let timeLeft = 0;
+        let isTimerRunning = false;
+        let canUndo = false;
+        let undoTimeoutId = null;
+        let lastAction = null; // 'set' or 'exercise'
+        
+        // ===================== SAVE =====================
+        function saveState() {
+            const toSave = {
+                exercises: state.exercises.map(e => ({...e})),
+                currentEx: state.currentEx,
+                dayNumber: state.dayNumber,
+                lastWorkoutEnd: state.lastWorkoutEnd,
+                isFinished: state.isFinished
+            };
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+        }
+        
+        // ===================== LOCK CHECK =====================
+        function isWorkoutLocked() {
+            if (!state.lastWorkoutEnd) return false;
+            const lastEnd = new Date(state.lastWorkoutEnd);
+            const now = new Date();
+            const sixAM = new Date(now);
+            sixAM.setHours(6, 0, 0, 0);
+            
+            // If last workout was today before 6 AM or yesterday, check if now is after 6 AM next day
+            const nextDay6AM = new Date(lastEnd);
+            nextDay6AM.setDate(nextDay6AM.getDate() + 1);
+            nextDay6AM.setHours(6, 0, 0, 0);
+            
+            return now < nextDay6AM;
+        }
+        
+        function getUnlockTime() {
+            if (!state.lastWorkoutEnd) return null;
+            const lastEnd = new Date(state.lastWorkoutEnd);
+            const unlock = new Date(lastEnd);
+            unlock.setDate(unlock.getDate() + 1);
+            unlock.setHours(6, 0, 0, 0);
+            return unlock;
+        }
+        
+        // ===================== RENDER =====================
         function render() {
             const stack = document.getElementById('stack');
-            const btnText = (sets === 3) ? "ЗАВЕРШИТЬ УПРАЖНЕНИЕ" : "ЗАВЕРШИТЬ ПОДХОД";
+            const dayInfo = document.getElementById('day-info');
             
-            stack.innerHTML = exercises.map((ex, i) => `
-                <div class="card ${i < currentEx ? 'done' : ''}" style="z-index: ${10 - i}">
-                    <h3>${ex}</h3>
-                    <div class="controls">
-                        <button onclick="changeW(-2.5)">- 2.5</button>
-                        <span>${weight} kg</span>
-                        <button onclick="changeW(2.5)">+ 2.5</button>
-                    </div>
-                    <p>Подход: ${sets + 1}/4 | Повторы: 10-12</p>
-                    <button id="main-btn" style="width:100%" onclick="nextSet()">${btnText}</button>
-                    ${sets > 0 ? `<button class="undo-btn" onclick="undoSet()">ОТМЕНИТЬ ПОДХОД</button>` : ''}
-                </div>
-            `).join('');
-        }
-
-        function changeW(val) {
-            weight = Math.max(0, weight + val);
-            render();
-        }
-
-        function nextSet() {
-            sets++;
-            if (sets === 4) {
-                currentEx++;
-                sets = 0;
+            // Show day info
+            dayInfo.textContent = `День ${state.dayNumber} | ${state.exercises.filter(e => e.setsDone === 4).length}/${state.exercises.length} упражнений`;
+            
+            // Check if all done
+            if (state.currentEx >= state.exercises.length) {
+                showLegendary();
+                return;
             }
+            
+            const current = state.exercises[state.currentEx];
+            const sets = current.setsDone;
+            const btnText = isTimerRunning 
+                ? `ОТДЫХ: ${formatTime(timeLeft)}`
+                : (sets === 3 ? "ЗАВЕРШИТЬ УПРАЖНЕНИЕ" : "ЗАВЕРШИТЬ ПОДХОД");
+            
+            stack.innerHTML = state.exercises.map((ex, i) => {
+                let cardClass = '';
+                if (i < state.currentEx) cardClass = 'done';
+                else if (i === state.currentEx) cardClass = 'active';
+                else cardClass = 'future';
+                
+                const isCurrent = i === state.currentEx;
+                const showUndo = isCurrent && canUndo && !isTimerRunning;
+                
+                return `
+                    <div class="card ${cardClass}" style="z-index: ${10 - i}; top: ${i * 8}px;">
+                        <h3>${ex.name}</h3>
+                        ${isCurrent ? `
+                            <div class="controls">
+                                <button onclick="changeW(-2.5)">- 2.5</button>
+                                <span>${ex.weight.toFixed(1)} kg</span>
+                                <button onclick="changeW(2.5)">+ 2.5</button>
+                            </div>
+                            <p class="info">Подход: ${sets + 1}/4 | Повторы: 10-12</p>
+                            <button id="main-btn" onclick="nextAction()" ${isTimerRunning ? 'disabled' : ''}>
+                                ${btnText}
+                            </button>
+                            ${showUndo ? `<button class="undo-btn" onclick="undoAction()">ОТМЕНИТЬ ПОДХОД</button>` : ''}
+                        ` : `
+                            <p class="info">Подходы: ${ex.setsDone}/4</p>
+                            <p class="info">Вес: ${ex.weight.toFixed(1)} kg</p>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60);
+            const s = seconds % 60;
+            return `${m}:${s < 10 ? '0'+s : s}`;
+        }
+        
+        // ===================== ACTIONS =====================
+        function changeW(delta) {
+            if (isTimerRunning) return;
+            const ex = state.exercises[state.currentEx];
+            ex.weight = Math.max(0, ex.weight + delta);
+            saveState();
             render();
         }
-
-        function undoSet() {
-            sets--;
+        
+        function nextAction() {
+            if (isTimerRunning) return;
+            
+            const ex = state.exercises[state.currentEx];
+            const wasSets = ex.setsDone;
+            
+            ex.setsDone++;
+            lastAction = (ex.setsDone === 4) ? 'exercise' : 'set';
+            
+            // Enable undo for 5 seconds
+            canUndo = true;
+            if (undoTimeoutId) clearTimeout(undoTimeoutId);
+            undoTimeoutId = setTimeout(() => {
+                canUndo = false;
+                render();
+            }, 5000);
+            
+            // Determine timer duration
+            let duration = 60; // default between sets
+            if (ex.setsDone === 4) {
+                duration = 180; // 3 min after exercise
+            }
+            
+            // If exercise completed, advance
+            if (ex.setsDone === 4) {
+                state.currentEx++;
+            }
+            
+            saveState();
+            
+            // Start timer
+            startTimer(duration);
+        }
+        
+        function startTimer(duration) {
+            isTimerRunning = true;
+            timeLeft = duration;
+            render();
+            
+            timerId = setInterval(() => {
+                timeLeft--;
+                
+                // Update button text without full re-render
+                const btn = document.getElementById('main-btn');
+                if (btn) btn.innerText = `ОТДЫХ: ${formatTime(timeLeft)}`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    timerId = null;
+                    isTimerRunning = false;
+                    canUndo = false;
+                    if (undoTimeoutId) {
+                        clearTimeout(undoTimeoutId);
+                        undoTimeoutId = null;
+                    }
+                    render();
+                }
+            }, 1000);
+        }
+        
+        function undoAction() {
+            if (!canUndo || isTimerRunning) return;
+            
+            const exIndex = lastAction === 'exercise' ? state.currentEx - 1 : state.currentEx;
+            if (exIndex < 0) return;
+            
+            const ex = state.exercises[exIndex];
+            
+            if (lastAction === 'exercise') {
+                // Rollback exercise completion
+                state.currentEx--;
+                ex.setsDone = 3;
+            } else {
+                // Rollback set
+                ex.setsDone = Math.max(0, ex.setsDone - 1);
+            }
+            
+            canUndo = false;
+            if (undoTimeoutId) {
+                clearTimeout(undoTimeoutId);
+                undoTimeoutId = null;
+            }
+            
+            // Stop timer if running
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                isTimerRunning = false;
+                timeLeft = 0;
+            }
+            
+            saveState();
             render();
         }
-
-        render();
+        
+        // ===================== LEGENDARY =====================
+        function showLegendary() {
+            state.isFinished = true;
+            state.lastWorkoutEnd = new Date().toISOString();
+            state.dayNumber++;
+            saveState();
+            
+            const legendary = document.getElementById('legendary');
+            const nextDayText = document.getElementById('next-day-text');
+            const unlock = getUnlockTime();
+            
+            if (unlock) {
+                nextDayText.textContent = `Следующая тренировка доступна с ${unlock.toLocaleString('ru-RU', {day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'})}`;
+            }
+            
+            legendary.classList.add('show');
+            document.getElementById('stack').innerHTML = '';
+        }
+        
+        // ===================== RESET (DEMO) =====================
+        function resetApp() {
+            localStorage.removeItem(STORAGE_KEY);
+            location.reload();
+        }
+        
+        // ===================== INIT =====================
+        function init() {
+            // Check lock
+            if (isWorkoutLocked() && !state.isFinished) {
+                const locked = document.getElementById('locked');
+                const reason = document.getElementById('locked-reason');
+                const unlock = getUnlockTime();
+                reason.textContent = `Следующая тренировка доступна после 06:00 (${unlock.toLocaleString('ru-RU')})`;
+                locked.classList.add('show');
+                return;
+            }
+            
+            // If was finished but unlocked now, reset for new day
+            if (state.isFinished && !isWorkoutLocked()) {
+                state.exercises.forEach(e => e.setsDone = 0);
+                state.currentEx = 0;
+                state.isFinished = false;
+                saveState();
+            }
+            
+            render();
+        }
+        
+        init();
     </script>
 </body>
-</html>
+</html>'''
+
+with open('/mnt/agents/output/push_day_aman.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+
+print("Saved successfully!")
