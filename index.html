@@ -2,52 +2,70 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legendary Fitness</title>
     <style>
-        :root { --bg: #121212; --card: #1e1e1e; --accent: #00d4ff; --text: #ffffff; }
-        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; margin: 0; padding: 20px; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .dots { display: flex; gap: 8px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; background: #444; }
-        .dot.done { background: #00ff00; }
-        .dot.missed { background: #ff0000; }
-        
-        .card { background: var(--card); padding: 20px; border-radius: 15px; border: 1px solid #333; }
-        .weight-control { display: flex; align-items: center; gap: 15px; margin: 10px 0; }
-        button { background: var(--accent); border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
-        
-        #legendary { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; font-size: 3rem; font-weight: 900; background: linear-gradient(90deg, #ffd700, #00d4ff); -webkit-background-clip: text; color: transparent; text-transform: uppercase; animation: pulse 1s infinite alternate; }
-        @keyframes pulse { from { transform: scale(0.9); } to { transform: scale(1.1); } }
+        :root { --bg: #121212; --card: #1e1e1e; --accent: #00d4ff; --gold: #ffd700; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; margin: 20px auto; max-width: 400px; border: 1px solid #333; }
+        button { background: var(--accent); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 5px; }
+        #timer { font-size: 1.5rem; margin: 10px; color: var(--accent); }
+        .legendary { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; font-size: 3rem; color: var(--gold); }
     </style>
 </head>
 <body>
-
-    <div class="header">
-        <h1>PUSH DAY</h1>
-        <div class="dots"><div class="dot done"></div><div class="dot"></div><div class="dot"></div></div>
+    <h1 id="day-title">PUSH DAY</h1>
+    <div id="app" class="card">
+        <h2 id="ex-name">Загрузка...</h2>
+        <div style="font-size: 1.5rem;">Вес: <span id="weight">50</span> кг</div>
+        <button onclick="updateWeight(-2.5)">-2.5</button>
+        <button onclick="updateWeight(2.5)">+2.5</button>
+        <br><br>
+        <button onclick="startTimer(60)">ЗАВЕРШИТЬ ПОДХОД</button>
+        <div id="timer">00:00</div>
+        <br>
+        <button onclick="nextEx()">СЛЕДУЮЩЕЕ УПРАЖНЕНИЕ</button>
     </div>
-
-    <div class="card">
-        <h3 id="ex-name">Жим штанги лежа</h3>
-        <div class="weight-control">
-            <button onclick="changeWeight(-2.5)">-2.5</button>
-            <span id="weight">50</span> кг
-            <button onclick="changeWeight(2.5)">+2.5</button>
-        </div>
-        <button id="finish-btn" onclick="finishExercise()">ЗАВЕРШИТЬ УПРАЖНЕНИЕ</button>
-    </div>
-
-    <div id="legendary">LEGENDARY</div>
+    <div id="legendary" class="legendary">LEGENDARY!</div>
 
     <script>
-        let weight = 50;
-        function changeWeight(val) { weight += val; document.getElementById('weight').innerText = weight; }
+        const exercises = ["Жим штанги лежа", "Жим гантелей сидя", "Отжимания на брусьях"];
+        let currentEx = 0;
+        let weights = JSON.parse(localStorage.getItem('weights')) || [50, 20, 0];
+
+        function loadEx() {
+            document.getElementById('ex-name').innerText = exercises[currentEx];
+            document.getElementById('weight').innerText = weights[currentEx];
+        }
+
+        function updateWeight(val) {
+            weights[currentEx] = parseFloat(weights[currentEx]) + val;
+            document.getElementById('weight').innerText = weights[currentEx];
+            localStorage.setItem('weights', JSON.stringify(weights));
+        }
+
+        function nextEx() {
+            currentEx = (currentEx + 1) % exercises.length;
+            if(currentEx === 0) finishExercise();
+            loadEx();
+        }
+
+        function startTimer(seconds) {
+            let timer = seconds;
+            let display = document.getElementById('timer');
+            let interval = setInterval(() => {
+                display.innerText = "Отдых: " + timer;
+                if (--timer < 0) { clearInterval(interval); display.innerText = "00:00"; }
+            }, 1000);
+        }
+
         function finishExercise() {
             const leg = document.getElementById('legendary');
             leg.style.display = 'flex';
-            setTimeout(() => { leg.style.display = 'none'; }, 2000);
+            setTimeout(() => { leg.style.display = 'none'; }, 3000);
         }
+
+        loadEx();
     </script>
 </body>
 </html>
