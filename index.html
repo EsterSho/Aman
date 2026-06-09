@@ -4,92 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PUSH DAY AMAN</title>
-    <!-- Иконка для iPhone -->
     <link rel="apple-touch-icon" href="icon.png">
     <style>
-        :root { --bg: #121212; --accent: #00d4ff; --gold: #ffd700; --orange: #ff9800; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; padding: 20px; }
-        .card { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
-        .controls { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
-        input[type="number"] { width: 60px; background: #333; color: #fff; border: none; padding: 5px; text-align: center; }
-        .prev-weight { color: var(--orange); font-size: 0.9rem; margin-left: 10px; }
-        button { background: var(--accent); border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .set-btn { background: #333; margin: 5px 0; display: block; width: 100%; text-align: center; }
-        .done-set { background: #2e7d32; color: #fff; text-align: center; padding: 10px; margin: 5px 0; border-radius: 6px; }
-        .timer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--accent); color: #000; text-align: center; padding: 15px; font-weight: bold; font-size: 1.2rem; }
-        #victory { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 10; font-size: 3rem; color: var(--gold); font-weight: bold; text-transform: uppercase; }
+        body { margin: 0; background: #0a0a0a; color: #fff; font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80'); background-size: cover; background-position: center; }
+        .glass-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; padding: 25px; width: 85%; max-width: 400px; margin-top: 50px; }
+        .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .dots { display: flex; gap: 10px; }
+        .dot { width: 14px; height: 14px; border-radius: 50%; background: #333; }
+        .dot.done { background: #00d4ff; box-shadow: 0 0 10px #00d4ff; }
+        .controls { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05); }
+        button { background: #00d4ff; border: none; padding: 12px 20px; border-radius: 12px; font-weight: bold; cursor: pointer; color: #000; }
+        #victory { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; font-size: 3rem; color: #ffd700; font-weight: bold; text-transform: uppercase; z-index: 100; }
     </style>
 </head>
 <body>
-    <h1>PUSH DAY AMAN</h1>
-    <div id="exercise-list"></div>
-    <div id="timer-bar" class="timer-bar" style="display:none;">Отдых: <span id="time-left">00</span></div>
+
     <div id="victory">LEGENDARY!</div>
 
+    <div class="glass-card">
+        <div class="header-row">
+            <h2 id="day-title">PUSH DAY</h2>
+            <div class="dots" id="indicator">
+                <div class="dot" id="d0"></div>
+                <div class="dot" id="d1"></div>
+                <div class="dot" id="d2"></div>
+            </div>
+        </div>
+        <div id="content"></div>
+        <button id="finish-btn" style="width:100%; margin-top:20px;" onclick="finishTraining()">ЗАВЕРШИТЬ ДЕНЬ</button>
+    </div>
+
     <script>
-        const exercises = ["Жим штанги лежа", "Жим гантелей сидя", "Отжимания на брусьях"];
-        let completedExercises = 0;
+        const schedule = [
+            { title: "PUSH DAY", ex: ["Жим штанги", "Жим гантелей", "Брусья"] },
+            { title: "PULL DAY", ex: ["Подтягивания", "Тяга штанги", "Сгибания"] },
+            { title: "LEGS DAY", ex: ["Приседания", "Жим ногами", "Подъем ног"] }
+        ];
 
-        exercises.forEach((ex, i) => {
-            let current = localStorage.getItem(`weight-${i}`) || 50;
-            let prev = localStorage.getItem(`prev-weight-${i}`) || 0;
+        let activeDay = parseInt(localStorage.getItem('activeDay')) || 0;
+
+        function render() {
+            document.getElementById('day-title').innerText = schedule[activeDay].title;
+            for(let i=0; i<3; i++) document.getElementById('d'+i).className = 'dot ' + (i < activeDay ? 'done' : '');
             
-            let div = document.createElement('div');
-            div.className = 'card';
-            div.id = `ex-${i}`;
-            div.innerHTML = `
-                <h3 id="title-${i}">${ex}</h3>
+            document.getElementById('content').innerHTML = schedule[activeDay].ex.map(ex => `
                 <div class="controls">
-                    <button onclick="adjW(${i}, -2.5)">-</button>
-                    <input type="number" id="w-${i}" value="${current}" onchange="saveWeight(${i})"> кг
-                    <button onclick="adjW(${i}, 2.5)">+</button>
-                    <span class="prev-weight">Пред: ${prev} кг</span>
+                    <span>${ex}</span>
+                    <span>50 kg</span>
                 </div>
-                <p>Повторы: 10-12</p>
-                <div id="content-${i}">
-                    ${[1,2,3,4].map(s => `<button class="set-btn" id="s-${i}-${s}" onclick="finishSet(${i}, ${s})">Завершить ${s}-й подход</button>`).join('')}
-                </div>
-            `;
-            document.getElementById('exercise-list').appendChild(div);
-        });
-
-        function adjW(i, val) {
-            let input = document.getElementById(`w-${i}`);
-            input.value = Math.max(0, parseFloat(input.value) + val);
-            saveWeight(i);
+            `).join('');
         }
 
-        function saveWeight(i) {
-            localStorage.setItem(`weight-${i}`, document.getElementById(`w-${i}`).value);
+        function finishTraining() {
+            document.getElementById('victory').style.display = 'flex';
+            localStorage.setItem('lastFinished', new Date().getTime());
+            setTimeout(() => {
+                document.getElementById('victory').style.display = 'none';
+                activeDay = (activeDay + 1) % 3;
+                localStorage.setItem('activeDay', activeDay);
+                location.reload();
+            }, 2000);
         }
 
-        function finishSet(i, s) {
-            document.getElementById(`s-${i}-${s}`).outerHTML = `<div class="done-set">Подход ${s} выполнен ✅</div>`;
-            if (s < 4) {
-                runPrecisionTimer(60);
-            } else {
-                let w = document.getElementById(`w-${i}`).value;
-                localStorage.setItem(`prev-weight-${i}`, w);
-                document.getElementById(`ex-${i}`).innerHTML = `<h3>${document.getElementById(`title-${i}`).innerText} | ${w} кг | ✅</h3>`;
-                completedExercises++;
-                if (completedExercises === exercises.length) {
-                    document.getElementById('victory').style.display = 'flex';
-                    setTimeout(() => { document.getElementById('victory').style.display = 'none'; }, 5000);
-                }
-                runPrecisionTimer(180);
-            }
-        }
-
-        function runPrecisionTimer(sec) {
-            const bar = document.getElementById('timer-bar');
-            bar.style.display = 'block';
-            const end = Date.now() + sec * 1000;
-            const int = setInterval(() => {
-                const rem = Math.round((end - Date.now()) / 1000);
-                if (rem < 0) { clearInterval(int); bar.style.display = 'none'; }
-                else { document.getElementById('time-left').innerText = rem; }
-            }, 100);
-        }
+        render();
     </script>
 </body>
 </html>
