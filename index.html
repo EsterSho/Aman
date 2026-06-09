@@ -1,4 +1,4 @@
-html = '''<!DOCTYPE html>
+'''<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,6 @@ html = '''<!DOCTYPE html>
         
         body {
             margin: 0;
-            background: #0a0a0f;
             color: #fff;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             display: flex;
@@ -18,9 +17,22 @@ html = '''<!DOCTYPE html>
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            background: #0a0a0f;
         }
         
-        /* ===== HEADER ===== */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            opacity: 0.25;
+            z-index: -1;
+        }
+        
         .header {
             width: 100%;
             padding: 20px 24px 10px;
@@ -35,11 +47,12 @@ html = '''<!DOCTYPE html>
             font-weight: 700;
             letter-spacing: 2px;
             text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
         }
         
         .day-dots {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
         }
         
@@ -48,42 +61,43 @@ html = '''<!DOCTYPE html>
             height: 14px;
             border-radius: 50%;
             background: #333;
+            border: 2px solid #444;
             transition: all 0.3s;
         }
         
         .dot.active {
             background: #00ff88;
-            box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.6);
         }
         
         .dot.completed {
-            background: #444;
+            background: #00ff88;
+            border-color: #00ff88;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
         }
         
-        /* ===== STACK CONTAINER ===== */
         .stack-container {
             position: relative;
             width: 90%;
             max-width: 380px;
-            height: 520px;
+            height: 480px;
             margin-top: 10px;
-            perspective: 1000px;
         }
         
-        /* ===== CARDS STACKED ===== */
         .card {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            background: rgba(255,255,255,0.06);
+            background: rgba(20, 20, 30, 0.75);
             backdrop-filter: blur(25px);
             -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.1);
             border-radius: 24px;
             padding: 20px;
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
             overflow: hidden;
         }
         
@@ -95,7 +109,6 @@ html = '''<!DOCTYPE html>
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
         }
         
-        /* Bookmark ribbon */
         .bookmark {
             position: absolute;
             top: 0;
@@ -107,7 +120,6 @@ html = '''<!DOCTYPE html>
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         
-        /* Card states */
         .card.active {
             z-index: 10;
             transform: translateY(0) scale(1);
@@ -116,11 +128,10 @@ html = '''<!DOCTYPE html>
         
         .card.peek {
             z-index: 5;
-            transform: translateY(55px) scale(0.96);
-            opacity: 0.5;
+            transform: translateY(52px) scale(0.97);
+            opacity: 0.6;
+            height: 420px;
             pointer-events: none;
-            height: 80px;
-            overflow: hidden;
         }
         
         .card.peek .card-content {
@@ -130,21 +141,42 @@ html = '''<!DOCTYPE html>
         .card.peek .peek-title {
             display: block;
             position: absolute;
-            bottom: 12px;
+            bottom: 16px;
+            left: 20px;
+            font-size: 0.95rem;
+            opacity: 0.7;
+            font-weight: 600;
+        }
+        
+        .card.peek2 {
+            z-index: 3;
+            transform: translateY(104px) scale(0.94);
+            opacity: 0.35;
+            height: 420px;
+            pointer-events: none;
+        }
+        
+        .card.peek2 .card-content {
+            opacity: 0;
+        }
+        
+        .card.peek2 .peek-title {
+            display: block;
+            position: absolute;
+            bottom: 16px;
             left: 20px;
             font-size: 0.9rem;
-            opacity: 0.6;
+            opacity: 0.5;
             font-weight: 600;
         }
         
         .card.done {
             z-index: 1;
-            transform: translateY(400px) scale(0.9);
+            transform: translateY(500px) scale(0.85);
             opacity: 0;
             pointer-events: none;
         }
         
-        /* Card content */
         .card-header {
             display: flex;
             align-items: center;
@@ -171,7 +203,6 @@ html = '''<!DOCTYPE html>
         
         .peek-title { display: none; }
         
-        /* ===== SETS LIST ===== */
         .sets-list {
             display: flex;
             flex-direction: column;
@@ -182,7 +213,7 @@ html = '''<!DOCTYPE html>
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px 0;
+            padding: 8px 0;
         }
         
         .set-num {
@@ -256,7 +287,6 @@ html = '''<!DOCTYPE html>
             box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
         }
         
-        /* ===== MAIN ACTION BUTTON ===== */
         .main-action {
             width: 100%;
             margin-top: 16px;
@@ -282,14 +312,13 @@ html = '''<!DOCTYPE html>
             cursor: not-allowed;
         }
         
-        /* ===== TIMER OVERLAY ===== */
         .timer-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.88);
+            backdrop-filter: blur(15px);
             z-index: 500;
             flex-direction: column;
             align-items: center;
@@ -351,12 +380,12 @@ html = '''<!DOCTYPE html>
         
         .timer-legendary {
             position: absolute;
-            bottom: -40px;
+            bottom: -45px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 800;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
             background: linear-gradient(135deg, #ffd700, #ffaa00);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -365,7 +394,7 @@ html = '''<!DOCTYPE html>
         }
         
         .undo-timer-btn {
-            margin-top: 60px;
+            margin-top: 70px;
             padding: 14px 40px;
             background: linear-gradient(135deg, #ff4757, #cc0000);
             border: none;
@@ -385,14 +414,14 @@ html = '''<!DOCTYPE html>
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* ===== COMPLETED ROW (at bottom) ===== */
         .completed-section {
             width: 90%;
             max-width: 380px;
-            margin-top: 20px;
+            margin-top: 30px;
             display: flex;
             flex-direction: column;
             gap: 8px;
+            padding-bottom: 40px;
         }
         
         .completed-row {
@@ -404,6 +433,7 @@ html = '''<!DOCTYPE html>
             border: 1px solid rgba(0, 255, 136, 0.15);
             border-radius: 16px;
             animation: slideIn 0.4s ease;
+            backdrop-filter: blur(10px);
         }
         
         .completed-row .name {
@@ -438,13 +468,12 @@ html = '''<!DOCTYPE html>
             box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
         }
         
-        /* ===== LEGENDARY SCREEN ===== */
         #legendary {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: #0a0a0f;
+            background: rgba(10, 10, 15, 0.95);
             z-index: 1000;
             flex-direction: column;
             align-items: center;
@@ -463,7 +492,6 @@ html = '''<!DOCTYPE html>
         }
         
         .legendary-ring svg {
-            transform: rotate(-90deg);
             animation: spin 20s linear infinite;
         }
         
@@ -486,7 +514,7 @@ html = '''<!DOCTYPE html>
         }
         
         .legendary-text h1 {
-            font-size: 2.8rem;
+            font-size: 2.6rem;
             font-weight: 900;
             letter-spacing: 6px;
             background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
@@ -537,12 +565,11 @@ html = '''<!DOCTYPE html>
             to { opacity: 1; transform: translateX(0); }
         }
         
-        /* ===== LOCKED SCREEN ===== */
         .locked {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: #0a0a0f;
+            background: rgba(10, 10, 15, 0.95);
             z-index: 999;
             display: none;
             flex-direction: column;
@@ -592,9 +619,8 @@ html = '''<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <!-- HEADER -->
     <div class="header">
-        <h1>PUSH DAY</h1>
+        <h1 id="day-title">PUSH DAY</h1>
         <div class="day-dots" id="day-dots">
             <div class="dot active"></div>
             <div class="dot"></div>
@@ -602,13 +628,10 @@ html = '''<!DOCTYPE html>
         </div>
     </div>
     
-    <!-- STACK -->
     <div class="stack-container" id="stack"></div>
     
-    <!-- COMPLETED EXERCISES -->
     <div class="completed-section" id="completed"></div>
     
-    <!-- TIMER OVERLAY -->
     <div class="timer-overlay" id="timer-overlay">
         <div class="timer-ring">
             <svg width="220" height="220" viewBox="0 0 220 220">
@@ -625,13 +648,12 @@ html = '''<!DOCTYPE html>
         <button class="undo-timer-btn" id="undo-timer-btn" onclick="undoFromTimer()">ОТМЕНИТЬ ПОДХОД</button>
     </div>
     
-    <!-- LEGENDARY SCREEN -->
     <div id="legendary">
         <div class="legendary-ring">
             <svg width="280" height="280" viewBox="0 0 280 280">
-                <circle class="bg" cx="140" cy="140" r="130" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
+                <circle cx="140" cy="140" r="130" stroke="rgba(255,255,255,0.05)" stroke-width="6" fill="none"/>
                 <circle class="progress" cx="140" cy="140" r="130" 
-                    stroke-dasharray="816" stroke-dashoffset="200" stroke-width="6"/>
+                    stroke-dasharray="816" stroke-dashoffset="200" stroke-width="6" fill="none"/>
             </svg>
             <div class="legendary-text">
                 <h1>LEGENDARY</h1>
@@ -650,7 +672,6 @@ html = '''<!DOCTYPE html>
         <button class="demo-reset" onclick="resetApp()">СБРОСИТЬ (ДЕМО)</button>
     </div>
     
-    <!-- LOCKED SCREEN -->
     <div class="locked" id="locked">
         <h2>🔒 ТРЕНИРОВКА ЗАБЛОКИРОВАНА</h2>
         <p>Следующая тренировка будет доступна только после 06:00 утра следующего дня.</p>
@@ -659,22 +680,46 @@ html = '''<!DOCTYPE html>
     </div>
 
     <script>
-        // ===================== STATE =====================
-        const STORAGE_KEY = 'pushDayAman_v3';
+        // ===================== PROGRAM DATA =====================
+        const PROGRAM = {
+            days: [
+                {
+                    name: "PUSH DAY",
+                    exercises: [
+                        { name: "Жим штанги лежа", weight: 50 },
+                        { name: "Жим гантелей сидя", weight: 20 },
+                        { name: "Отжимания на брусьях", weight: 0 }
+                    ]
+                },
+                {
+                    name: "PULL DAY",
+                    exercises: [
+                        { name: "Подтягивания", weight: 0 },
+                        { name: "Тяга штанги в наклоне", weight: 40 },
+                        { name: "Сгибания рук со штангой стоя", weight: 25 }
+                    ]
+                },
+                {
+                    name: "LEGS DAY",
+                    exercises: [
+                        { name: "Приседания со штангой", weight: 60 },
+                        { name: "Жим ногами", weight: 80 },
+                        { name: "Подъем ног в висе", weight: 0 }
+                    ]
+                }
+            ]
+        };
         
-        const DEFAULT_EXERCISES = [
-            { name: "Жим штанги лежа", weight: 50, sets: [null, null, null, null] },
-            { name: "Жим гантелей сидя", weight: 20, sets: [null, null, null, null] },
-            { name: "Брусья", weight: 0, sets: [null, null, null, null] }
-        ];
+        const STORAGE_KEY = 'pushDayAman_v5';
         
         function loadState() {
             const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) return JSON.parse(saved);
             return {
-                exercises: JSON.parse(JSON.stringify(DEFAULT_EXERCISES)),
+                currentDay: 0,
+                dayProgress: [false, false, false],
+                exercises: JSON.parse(JSON.stringify(PROGRAM.days[0].exercises.map(e => ({...e, sets: [null, null, null, null]})))),
                 currentEx: 0,
-                dayNumber: 1,
                 lastWorkoutEnd: null,
                 isFinished: false
             };
@@ -693,7 +738,6 @@ html = '''<!DOCTYPE html>
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
         
-        // ===================== LOCK =====================
         function isWorkoutLocked() {
             if (!state.lastWorkoutEnd) return false;
             const lastEnd = new Date(state.lastWorkoutEnd);
@@ -713,22 +757,34 @@ html = '''<!DOCTYPE html>
             return unlock;
         }
         
-        // ===================== RENDER STACK =====================
+        function initDay() {
+            const day = PROGRAM.days[state.currentDay];
+            document.getElementById('day-title').textContent = day.name;
+            
+            if (!state.exercises || state.exercises.length !== day.exercises.length) {
+                state.exercises = JSON.parse(JSON.stringify(day.exercises.map(e => ({...e, sets: [null, null, null, null]}))));
+                state.currentEx = 0;
+            }
+        }
+        
+        // ===================== RENDER =====================
         function render() {
+            initDay();
+            
             const stack = document.getElementById('stack');
             const completed = document.getElementById('completed');
             const dots = document.getElementById('day-dots');
             
-            // Update dots
-            dots.innerHTML = state.exercises.map((ex, i) => {
+            // Dots: completed = green, current = active green, future = gray
+            dots.innerHTML = state.dayProgress.map((done, i) => {
                 let cls = 'dot';
-                if (i === state.currentEx && !state.isFinished) cls += ' active';
-                else if (ex.sets.every(s => s !== null)) cls += ' completed';
+                if (done) cls += ' completed';
+                else if (i === state.currentDay) cls += ' active';
                 return `<div class="${cls}"></div>`;
             }).join('');
             
-            // Render completed rows
-            const doneExercises = state.exercises.filter((ex, i) => i < state.currentEx || ex.sets.every(s => s !== null));
+            // Completed rows
+            const doneExercises = state.exercises.filter((ex, i) => i < state.currentEx);
             completed.innerHTML = doneExercises.map(ex => `
                 <div class="completed-row">
                     <span class="name">${ex.name}</span>
@@ -739,9 +795,9 @@ html = '''<!DOCTYPE html>
                 </div>
             `).join('');
             
-            // Render stack
+            // Stack
             if (state.currentEx >= state.exercises.length) {
-                showLegendary();
+                finishDay();
                 return;
             }
             
@@ -754,7 +810,7 @@ html = '''<!DOCTYPE html>
                 const isCurrent = i === state.currentEx;
                 const isFuture = i > state.currentEx;
                 
-                if (isDone) continue; // done exercises go to bottom rows
+                if (isDone) continue;
                 
                 let cardClass = '';
                 let style = '';
@@ -763,9 +819,14 @@ html = '''<!DOCTYPE html>
                     cardClass = 'active';
                     style = 'z-index: 10;';
                 } else if (isFuture) {
-                    cardClass = 'peek';
-                    const offset = (i - state.currentEx) * 55;
-                    style = `z-index: ${10 - i}; transform: translateY(${offset}px) scale(0.96);`;
+                    const peekIndex = i - state.currentEx;
+                    if (peekIndex === 1) {
+                        cardClass = 'peek';
+                        style = `z-index: ${8 - i};`;
+                    } else {
+                        cardClass = 'peek2';
+                        style = `z-index: ${5 - i};`;
+                    }
                 }
                 
                 html += renderCard(ex, i, cardClass, style, isCurrent);
@@ -791,10 +852,6 @@ html = '''<!DOCTYPE html>
             
             const setsHtml = ex.sets.map((s, i) => {
                 const isDone = s !== null;
-                const isWeight = i % 2 === 0; // alternate weight/reps? No, let's do weight for all for simplicity
-                // Actually from sketch: row 1 = [50kg][10reps][✓], row 2 = [-][50kg][+], etc
-                // Let's do: each row has weight controls and a check
-                
                 const showControls = !isDone && i === ex.sets.filter(x => x !== null).length;
                 const rowNum = i + 1;
                 
@@ -893,7 +950,7 @@ html = '''<!DOCTYPE html>
             overlay.classList.add('show');
             undoBtn.style.display = 'block';
             
-            const circumference = 2 * Math.PI * 100; // r=100
+            const circumference = 2 * Math.PI * 100;
             circle.style.strokeDasharray = circumference;
             
             display.textContent = duration;
@@ -905,7 +962,6 @@ html = '''<!DOCTYPE html>
                 const offset = circumference - (timeLeft / totalTime) * circumference;
                 circle.style.strokeDashoffset = offset;
                 
-                // Hide undo after 5 seconds
                 if (totalTime - timeLeft >= 5) {
                     undoBtn.style.display = 'none';
                     canUndo = false;
@@ -918,7 +974,6 @@ html = '''<!DOCTYPE html>
                     canUndo = false;
                     overlay.classList.remove('show');
                     
-                    // Check if exercise completed
                     const ex = state.exercises[state.currentEx];
                     if (ex.sets.every(s => s !== null)) {
                         state.currentEx++;
@@ -946,11 +1001,29 @@ html = '''<!DOCTYPE html>
             render();
         }
         
+        // ===================== DAY COMPLETION =====================
+        function finishDay() {
+            state.dayProgress[state.currentDay] = true;
+            state.lastWorkoutEnd = new Date().toISOString();
+            
+            if (state.dayProgress.every(d => d)) {
+                showLegendary();
+                return;
+            }
+            
+            state.currentDay++;
+            const nextDay = PROGRAM.days[state.currentDay];
+            state.exercises = JSON.parse(JSON.stringify(nextDay.exercises.map(e => ({...e, sets: [null, null, null, null]}))));
+            state.currentEx = 0;
+            saveState();
+            
+            render();
+        }
+        
         // ===================== LEGENDARY =====================
         function showLegendary() {
             state.isFinished = true;
             state.lastWorkoutEnd = new Date().toISOString();
-            state.dayNumber++;
             saveState();
             
             const legendary = document.getElementById('legendary');
@@ -958,7 +1031,7 @@ html = '''<!DOCTYPE html>
             const unlock = getUnlockTime();
             
             if (unlock) {
-                nextText.textContent = `Следующий день: ${unlock.toLocaleString('ru-RU', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})}`;
+                nextText.textContent = `Новый цикл доступен с ${unlock.toLocaleString('ru-RU', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})}`;
             }
             
             legendary.classList.add('show');
@@ -982,7 +1055,9 @@ html = '''<!DOCTYPE html>
             }
             
             if (state.isFinished && !isWorkoutLocked()) {
-                state.exercises = JSON.parse(JSON.stringify(DEFAULT_EXERCISES));
+                state.dayProgress = [false, false, false];
+                state.currentDay = 0;
+                state.exercises = JSON.parse(JSON.stringify(PROGRAM.days[0].exercises.map(e => ({...e, sets: [null, null, null, null]}))));
                 state.currentEx = 0;
                 state.isFinished = false;
                 saveState();
