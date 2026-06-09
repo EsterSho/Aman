@@ -15,20 +15,23 @@
         .set-btn { background: #333; margin: 5px 0; display: block; width: 100%; text-align: center; }
         .done-set { background: #2e7d32; color: #fff; text-align: center; padding: 10px; margin: 5px 0; border-radius: 6px; }
         .timer-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--accent); color: #000; text-align: center; padding: 15px; font-weight: bold; font-size: 1.2rem; }
+        /* Экран победы */
+        #victory { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; z-index: 10; font-size: 3rem; color: var(--gold); font-weight: bold; text-transform: uppercase; }
     </style>
 </head>
 <body>
     <h1>PUSH DAY AMAN</h1>
     <div id="exercise-list"></div>
     <div id="timer-bar" class="timer-bar" style="display:none;">Отдых: <span id="time-left">00</span></div>
+    <div id="victory">LEGENDARY!</div>
 
     <script>
         const exercises = ["Жим штанги лежа", "Жим гантелей сидя", "Отжимания на брусьях"];
-        
+        let completedExercises = 0;
+
         exercises.forEach((ex, i) => {
             let current = localStorage.getItem(`weight-${i}`) || 50;
-            // Теперь по умолчанию 0 кг, если тренировка первая
-            let prev = localStorage.getItem(`prev-weight-${i}`) || 0; 
+            let prev = localStorage.getItem(`prev-weight-${i}`) || 0;
             
             let div = document.createElement('div');
             div.className = 'card';
@@ -65,9 +68,13 @@
                 runPrecisionTimer(60);
             } else {
                 let w = document.getElementById(`w-${i}`).value;
-                // Сохраняем текущий вес как новый "предыдущий" для следующего раза
                 localStorage.setItem(`prev-weight-${i}`, w);
                 document.getElementById(`ex-${i}`).innerHTML = `<h3>${document.getElementById(`title-${i}`).innerText} | ${w} кг | ✅</h3>`;
+                completedExercises++;
+                if (completedExercises === exercises.length) {
+                    document.getElementById('victory').style.display = 'flex';
+                    setTimeout(() => { document.getElementById('victory').style.display = 'none'; }, 5000);
+                }
                 runPrecisionTimer(180);
             }
         }
