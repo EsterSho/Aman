@@ -5,67 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Legendary Fitness</title>
     <style>
-        :root { --bg: #121212; --card: #1e1e1e; --accent: #00d4ff; --gold: #ffd700; }
-        body { background: var(--bg); color: #fff; font-family: sans-serif; padding: 20px; text-align: center; }
-        .card { background: var(--card); padding: 20px; border-radius: 15px; margin: 20px auto; max-width: 400px; border: 1px solid #333; }
-        button { background: var(--accent); border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 5px; }
-        #timer { font-size: 1.5rem; margin: 10px; color: var(--accent); }
-        .legendary { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; justify-content: center; align-items: center; font-size: 3rem; color: var(--gold); }
+        :root { --bg: #121212; --card: #1e1e1e; --accent: #00d4ff; }
+        body { background: var(--bg); color: #fff; font-family: sans-serif; padding: 20px; }
+        .card { background: var(--card); padding: 20px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
+        .set-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #333; }
+        button { background: var(--accent); border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; margin-top: 5px; }
+        .check { width: 30px; height: 30px; cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1 id="day-title">PUSH DAY</h1>
-    <div id="app" class="card">
-        <h2 id="ex-name">Загрузка...</h2>
-        <div style="font-size: 1.5rem;">Вес: <span id="weight">50</span> кг</div>
-        <button onclick="updateWeight(-2.5)">-2.5</button>
-        <button onclick="updateWeight(2.5)">+2.5</button>
-        <br><br>
-        <button onclick="startTimer(60)">ЗАВЕРШИТЬ ПОДХОД</button>
-        <div id="timer">00:00</div>
-        <br>
-        <button onclick="nextEx()">СЛЕДУЮЩЕЕ УПРАЖНЕНИЕ</button>
-    </div>
-    <div id="legendary" class="legendary">LEGENDARY!</div>
+    <h1>PUSH DAY</h1>
+    <div id="exercise-list"></div>
 
     <script>
         const exercises = ["Жим штанги лежа", "Жим гантелей сидя", "Отжимания на брусьях"];
-        let currentEx = 0;
-        let weights = JSON.parse(localStorage.getItem('weights')) || [50, 20, 0];
+        const container = document.getElementById('exercise-list');
 
-        function loadEx() {
-            document.getElementById('ex-name').innerText = exercises[currentEx];
-            document.getElementById('weight').innerText = weights[currentEx];
-        }
-
-        function updateWeight(val) {
-            weights[currentEx] = parseFloat(weights[currentEx]) + val;
-            document.getElementById('weight').innerText = weights[currentEx];
-            localStorage.setItem('weights', JSON.stringify(weights));
-        }
-
-        function nextEx() {
-            currentEx = (currentEx + 1) % exercises.length;
-            if(currentEx === 0) finishExercise();
-            loadEx();
-        }
-
-        function startTimer(seconds) {
-            let timer = seconds;
-            let display = document.getElementById('timer');
-            let interval = setInterval(() => {
-                display.innerText = "Отдых: " + timer;
-                if (--timer < 0) { clearInterval(interval); display.innerText = "00:00"; }
-            }, 1000);
-        }
-
-        function finishExercise() {
-            const leg = document.getElementById('legendary');
-            leg.style.display = 'flex';
-            setTimeout(() => { leg.style.display = 'none'; }, 3000);
-        }
-
-        loadEx();
+        exercises.forEach((ex, idx) => {
+            let div = document.createElement('div');
+            div.className = 'card';
+            div.innerHTML = `
+                <h3>${ex}</h3>
+                <p>4 подхода по 10-12 раз</p>
+                <div id="sets-${idx}">
+                    ${[1,2,3,4].map(s => `
+                        <div class="set-row">
+                            <span>Подход ${s}</span>
+                            <input type="checkbox" class="check">
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(div);
+        });
     </script>
 </body>
 </html>
