@@ -1,193 +1,450 @@
-
 html = '''<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>PUSH DAY AMAN</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
             margin: 0;
-            background: #111;
+            background: #0a0a0f;
             color: #fff;
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
             overflow-x: hidden;
+            position: relative;
         }
         
-        #title {
-            margin-top: 30px;
-            font-size: 1.8rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+        /* ===== HEADER ===== */
+        .header {
+            width: 100%;
+            padding: 20px 24px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             z-index: 100;
         }
         
-        .stack {
-            position: relative;
-            width: 90%;
-            max-width: 400px;
-            margin-top: 30px;
-            height: 500px;
+        .header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
         
+        .day-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #333;
+            transition: all 0.3s;
+        }
+        
+        .dot.active {
+            background: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+        }
+        
+        .dot.completed {
+            background: #444;
+        }
+        
+        /* ===== STACK CONTAINER ===== */
+        .stack-container {
+            position: relative;
+            width: 90%;
+            max-width: 380px;
+            height: 520px;
+            margin-top: 10px;
+            perspective: 1000px;
+        }
+        
+        /* ===== CARDS STACKED ===== */
         .card {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            background: rgba(255,255,255,0.08);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255,255,255,0.12);
             border-radius: 24px;
-            padding: 24px;
+            padding: 20px;
             transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            transform-origin: center top;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
         
-        .card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 16px;
-            text-align: center;
-            font-weight: 700;
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
         }
         
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(0,0,0,0.25);
-            padding: 14px;
-            border-radius: 14px;
-            margin: 16px 0;
+        /* Bookmark ribbon */
+        .bookmark {
+            position: absolute;
+            top: 0;
+            right: 20px;
+            width: 28px;
+            height: 36px;
+            background: linear-gradient(180deg, #c9a84c, #a08030);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 80%, 0 100%);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
         
-        .controls span {
-            font-size: 1.3rem;
-            font-weight: 700;
-            min-width: 80px;
-            text-align: center;
-        }
-        
-        .controls button {
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #fff;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 1rem;
-        }
-        
-        .controls button:hover {
-            background: rgba(255,255,255,0.25);
-        }
-        
-        .controls button:active {
-            transform: scale(0.95);
-        }
-        
-        .info {
-            text-align: center;
-            font-size: 1rem;
-            opacity: 0.8;
-            margin: 12px 0;
-        }
-        
-        #main-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border: none;
-            padding: 16px;
-            border-radius: 14px;
-            font-weight: 800;
-            font-size: 1.1rem;
-            cursor: pointer;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s;
-            margin-top: 10px;
-            box-shadow: 0 4px 20px rgba(0,212,255,0.3);
-        }
-        
-        #main-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,212,255,0.5);
-        }
-        
-        #main-btn:disabled {
-            background: linear-gradient(135deg, #ff6b35, #ff4757);
-            cursor: not-allowed;
-            box-shadow: 0 4px 20px rgba(255,107,53,0.3);
-        }
-        
-        .undo-btn {
-            background: linear-gradient(135deg, #ff4757, #cc0000);
-            border: none;
-            padding: 14px;
-            border-radius: 14px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            color: #fff;
-            text-transform: uppercase;
-            width: 100%;
-            margin-top: 10px;
-            animation: slideIn 0.3s ease;
-            box-shadow: 0 4px 20px rgba(255,71,87,0.3);
-            transition: all 0.2s;
-        }
-        
-        .undo-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 25px rgba(255,71,87,0.5);
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .card.done {
-            transform: translateY(60px) scale(0.92);
-            opacity: 0.35;
-            filter: grayscale(0.6);
-            pointer-events: none;
-        }
-        
+        /* Card states */
         .card.active {
+            z-index: 10;
             transform: translateY(0) scale(1);
             opacity: 1;
         }
         
-        .card.future {
-            transform: translateY(30px) scale(0.96);
+        .card.peek {
+            z-index: 5;
+            transform: translateY(55px) scale(0.96);
             opacity: 0.5;
+            pointer-events: none;
+            height: 80px;
+            overflow: hidden;
         }
         
-        /* LEGENDARY SCREEN */
+        .card.peek .card-content {
+            opacity: 0;
+        }
+        
+        .card.peek .peek-title {
+            display: block;
+            position: absolute;
+            bottom: 12px;
+            left: 20px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+            font-weight: 600;
+        }
+        
+        .card.done {
+            z-index: 1;
+            transform: translateY(400px) scale(0.9);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        /* Card content */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .exercise-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(255,255,255,0.08);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+        }
+        
+        .card-header h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .peek-title { display: none; }
+        
+        /* ===== SETS LIST ===== */
+        .sets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .set-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+        }
+        
+        .set-num {
+            width: 24px;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            font-weight: 600;
+        }
+        
+        .set-inputs {
+            display: flex;
+            gap: 8px;
+            flex: 1;
+            align-items: center;
+        }
+        
+        .set-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: none;
+            background: #00d4ff;
+            color: #000;
+            font-weight: 800;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        
+        .set-btn:active {
+            transform: scale(0.92);
+        }
+        
+        .set-value {
+            flex: 1;
+            height: 44px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+        
+        .set-check {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+        
+        .set-check.empty {
+            border: 2px solid rgba(255,255,255,0.15);
+        }
+        
+        .set-check.done {
+            background: #00ff88;
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        /* ===== MAIN ACTION BUTTON ===== */
+        .main-action {
+            width: 100%;
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.05));
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+        
+        .main-action:hover:not(:disabled) {
+            background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+        }
+        
+        .main-action:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        /* ===== TIMER OVERLAY ===== */
+        .timer-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 500;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .timer-overlay.show {
+            display: flex;
+        }
+        
+        .timer-ring {
+            width: 220px;
+            height: 220px;
+            position: relative;
+        }
+        
+        .timer-ring svg {
+            transform: rotate(-90deg);
+        }
+        
+        .timer-ring circle {
+            fill: none;
+            stroke-width: 8;
+        }
+        
+        .timer-ring .bg {
+            stroke: rgba(255,255,255,0.08);
+        }
+        
+        .timer-ring .progress {
+            stroke: #00d4ff;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 10px rgba(0, 212, 255, 0.5));
+            transition: stroke-dashoffset 1s linear;
+        }
+        
+        .timer-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .timer-text .time {
+            font-size: 3.5rem;
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            letter-spacing: -2px;
+        }
+        
+        .timer-text .label {
+            font-size: 0.9rem;
+            opacity: 0.5;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 4px;
+        }
+        
+        .timer-legendary {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #ffd700, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            white-space: nowrap;
+        }
+        
+        .undo-timer-btn {
+            margin-top: 60px;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #ff4757, #cc0000);
+            border: none;
+            border-radius: 14px;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 20px rgba(255,71,87,0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== COMPLETED ROW (at bottom) ===== */
+        .completed-section {
+            width: 90%;
+            max-width: 380px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .completed-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: rgba(0, 255, 136, 0.06);
+            border: 1px solid rgba(0, 255, 136, 0.15);
+            border-radius: 16px;
+            animation: slideIn 0.4s ease;
+        }
+        
+        .completed-row .name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            opacity: 0.9;
+        }
+        
+        .completed-row .info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .completed-row .weight {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #00ff88;
+        }
+        
+        .completed-row .check {
+            width: 24px;
+            height: 24px;
+            background: #00ff88;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: 800;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+        }
+        
+        /* ===== LEGENDARY SCREEN ===== */
         #legendary {
             display: none;
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95);
+            background: #0a0a0f;
             z-index: 1000;
             flex-direction: column;
             align-items: center;
@@ -199,37 +456,70 @@ html = '''<!DOCTYPE html>
             display: flex;
         }
         
-        #legendary h1 {
-            font-size: 4rem;
+        .legendary-ring {
+            width: 280px;
+            height: 280px;
+            position: relative;
+        }
+        
+        .legendary-ring svg {
+            transform: rotate(-90deg);
+            animation: spin 20s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .legendary-ring .progress {
+            stroke: #00d4ff;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.6));
+        }
+        
+        .legendary-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        
+        .legendary-text h1 {
+            font-size: 2.8rem;
             font-weight: 900;
+            letter-spacing: 6px;
             background: linear-gradient(135deg, #ffd700, #ffaa00, #ffd700);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-transform: uppercase;
-            letter-spacing: 8px;
-            animation: pulse 1.5s ease infinite;
-            text-align: center;
+            animation: pulse 2s ease infinite;
         }
         
-        #legendary p {
-            margin-top: 20px;
+        .legendary-text .sec {
+            font-size: 1rem;
+            opacity: 0.5;
+            letter-spacing: 4px;
+            margin-top: 8px;
+        }
+        
+        .legendary-stars {
+            position: absolute;
+            width: 100%; height: 100%;
+            top: 0; left: 0;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            color: #ffd700;
             font-size: 1.2rem;
-            opacity: 0.7;
-            text-align: center;
+            animation: twinkle 2s ease infinite;
         }
         
-        #legendary .next-unlock {
-            margin-top: 40px;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, #00d4ff, #0099cc);
-            border: none;
-            border-radius: 14px;
-            color: #fff;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            text-transform: uppercase;
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
         
         @keyframes fadeIn {
@@ -242,24 +532,24 @@ html = '''<!DOCTYPE html>
             50% { transform: scale(1.05); }
         }
         
-        /* Day info */
-        .day-info {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            opacity: 0.6;
-            text-align: center;
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
         }
         
+        /* ===== LOCKED SCREEN ===== */
         .locked {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
+            background: #0a0a0f;
             z-index: 999;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            padding: 40px;
+            text-align: center;
         }
         
         .locked.show {
@@ -267,54 +557,122 @@ html = '''<!DOCTYPE html>
         }
         
         .locked h2 {
-            font-size: 2rem;
-            margin-bottom: 20px;
+            font-size: 1.8rem;
+            margin-bottom: 16px;
         }
         
         .locked p {
-            opacity: 0.7;
+            opacity: 0.5;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        
+        .locked .unlock-time {
+            margin-top: 24px;
+            padding: 16px 32px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
             font-size: 1.1rem;
+            font-weight: 700;
+            color: #00d4ff;
+        }
+        
+        .demo-reset {
+            margin-top: 40px;
+            padding: 14px 32px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 0.9rem;
+            cursor: pointer;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
-    <h1 id="title">PUSH DAY AMAN</h1>
-    <div class="day-info" id="day-info"></div>
-    <div class="stack" id="stack"></div>
-
+    <!-- HEADER -->
+    <div class="header">
+        <h1>PUSH DAY</h1>
+        <div class="day-dots" id="day-dots">
+            <div class="dot active"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+    
+    <!-- STACK -->
+    <div class="stack-container" id="stack"></div>
+    
+    <!-- COMPLETED EXERCISES -->
+    <div class="completed-section" id="completed"></div>
+    
+    <!-- TIMER OVERLAY -->
+    <div class="timer-overlay" id="timer-overlay">
+        <div class="timer-ring">
+            <svg width="220" height="220" viewBox="0 0 220 220">
+                <circle class="bg" cx="110" cy="110" r="100"/>
+                <circle class="progress" id="timer-circle" cx="110" cy="110" r="100" 
+                    stroke-dasharray="628" stroke-dashoffset="0"/>
+            </svg>
+            <div class="timer-text">
+                <div class="time" id="timer-display">60</div>
+                <div class="label">SEC</div>
+            </div>
+            <div class="timer-legendary">LEGENDARY</div>
+        </div>
+        <button class="undo-timer-btn" id="undo-timer-btn" onclick="undoFromTimer()">ОТМЕНИТЬ ПОДХОД</button>
+    </div>
+    
     <!-- LEGENDARY SCREEN -->
     <div id="legendary">
-        <h1>LEGENDARY!</h1>
-        <p>Тренировка пройдена. Результаты зафиксированы.</p>
-        <p id="next-day-text"></p>
-        <button class="next-unlock" onclick="resetApp()">НАЧАТЬ ЗАНОВО (ДЕМО)</button>
+        <div class="legendary-ring">
+            <svg width="280" height="280" viewBox="0 0 280 280">
+                <circle class="bg" cx="140" cy="140" r="130" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
+                <circle class="progress" cx="140" cy="140" r="130" 
+                    stroke-dasharray="816" stroke-dashoffset="200" stroke-width="6"/>
+            </svg>
+            <div class="legendary-text">
+                <h1>LEGENDARY</h1>
+                <div class="sec">SEC</div>
+            </div>
+            <div class="legendary-stars">
+                <span class="star" style="top:10%;left:20%;animation-delay:0s">✦</span>
+                <span class="star" style="top:15%;right:15%;animation-delay:0.3s">✦</span>
+                <span class="star" style="top:60%;left:10%;animation-delay:0.6s">✦</span>
+                <span class="star" style="top:70%;right:20%;animation-delay:0.9s">✦</span>
+                <span class="star" style="top:40%;left:5%;animation-delay:1.2s">✦</span>
+            </div>
+        </div>
+        <p style="margin-top:40px;opacity:0.6;font-size:1.1rem;">Тренировка пройдена!</p>
+        <p id="next-unlock-text" style="margin-top:12px;opacity:0.4;font-size:0.9rem;"></p>
+        <button class="demo-reset" onclick="resetApp()">СБРОСИТЬ (ДЕМО)</button>
     </div>
-
+    
     <!-- LOCKED SCREEN -->
     <div class="locked" id="locked">
         <h2>🔒 ТРЕНИРОВКА ЗАБЛОКИРОВАНА</h2>
-        <p id="locked-reason"></p>
+        <p>Следующая тренировка будет доступна только после 06:00 утра следующего дня.</p>
+        <div class="unlock-time" id="unlock-time"></div>
+        <button class="demo-reset" onclick="resetApp()" style="margin-top:30px;">СБРОСИТЬ (ДЕМО)</button>
     </div>
 
     <script>
         // ===================== STATE =====================
-        const STORAGE_KEY = 'pushDayAman_v1';
+        const STORAGE_KEY = 'pushDayAman_v3';
         
-        // Default exercises with individual weights
         const DEFAULT_EXERCISES = [
-            { name: "Жим штанги лежа", weight: 50 },
-            { name: "Жим гантелей сидя", weight: 20 },
-            { name: "Брусья", weight: 0 }
+            { name: "Жим штанги лежа", weight: 50, sets: [null, null, null, null] },
+            { name: "Жим гантелей сидя", weight: 20, sets: [null, null, null, null] },
+            { name: "Брусья", weight: 0, sets: [null, null, null, null] }
         ];
         
-        // Load or init state
         function loadState() {
             const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                return JSON.parse(saved);
-            }
+            if (saved) return JSON.parse(saved);
             return {
-                exercises: DEFAULT_EXERCISES.map(e => ({...e, setsDone: 0})),
+                exercises: JSON.parse(JSON.stringify(DEFAULT_EXERCISES)),
                 currentEx: 0,
                 dayNumber: 1,
                 lastWorkoutEnd: null,
@@ -324,39 +682,25 @@ html = '''<!DOCTYPE html>
         
         let state = loadState();
         
-        // Runtime state (not saved)
         let timerId = null;
         let timeLeft = 0;
+        let totalTime = 0;
         let isTimerRunning = false;
         let canUndo = false;
-        let undoTimeoutId = null;
-        let lastAction = null; // 'set' or 'exercise'
+        let lastAction = null;
         
-        // ===================== SAVE =====================
         function saveState() {
-            const toSave = {
-                exercises: state.exercises.map(e => ({...e})),
-                currentEx: state.currentEx,
-                dayNumber: state.dayNumber,
-                lastWorkoutEnd: state.lastWorkoutEnd,
-                isFinished: state.isFinished
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
         
-        // ===================== LOCK CHECK =====================
+        // ===================== LOCK =====================
         function isWorkoutLocked() {
             if (!state.lastWorkoutEnd) return false;
             const lastEnd = new Date(state.lastWorkoutEnd);
             const now = new Date();
-            const sixAM = new Date(now);
-            sixAM.setHours(6, 0, 0, 0);
-            
-            // If last workout was today before 6 AM or yesterday, check if now is after 6 AM next day
             const nextDay6AM = new Date(lastEnd);
             nextDay6AM.setDate(nextDay6AM.getDate() + 1);
             nextDay6AM.setHours(6, 0, 0, 0);
-            
             return now < nextDay6AM;
         }
         
@@ -369,164 +713,235 @@ html = '''<!DOCTYPE html>
             return unlock;
         }
         
-        // ===================== RENDER =====================
+        // ===================== RENDER STACK =====================
         function render() {
             const stack = document.getElementById('stack');
-            const dayInfo = document.getElementById('day-info');
+            const completed = document.getElementById('completed');
+            const dots = document.getElementById('day-dots');
             
-            // Show day info
-            dayInfo.textContent = `День ${state.dayNumber} | ${state.exercises.filter(e => e.setsDone === 4).length}/${state.exercises.length} упражнений`;
+            // Update dots
+            dots.innerHTML = state.exercises.map((ex, i) => {
+                let cls = 'dot';
+                if (i === state.currentEx && !state.isFinished) cls += ' active';
+                else if (ex.sets.every(s => s !== null)) cls += ' completed';
+                return `<div class="${cls}"></div>`;
+            }).join('');
             
-            // Check if all done
+            // Render completed rows
+            const doneExercises = state.exercises.filter((ex, i) => i < state.currentEx || ex.sets.every(s => s !== null));
+            completed.innerHTML = doneExercises.map(ex => `
+                <div class="completed-row">
+                    <span class="name">${ex.name}</span>
+                    <div class="info">
+                        <span class="weight">${ex.weight.toFixed(1)} кг</span>
+                        <div class="check">✓</div>
+                    </div>
+                </div>
+            `).join('');
+            
+            // Render stack
             if (state.currentEx >= state.exercises.length) {
                 showLegendary();
                 return;
             }
             
-            const current = state.exercises[state.currentEx];
-            const sets = current.setsDone;
-            const btnText = isTimerRunning 
-                ? `ОТДЫХ: ${formatTime(timeLeft)}`
-                : (sets === 3 ? "ЗАВЕРШИТЬ УПРАЖНЕНИЕ" : "ЗАВЕРШИТЬ ПОДХОД");
+            let html = '';
+            const totalEx = state.exercises.length;
             
-            stack.innerHTML = state.exercises.map((ex, i) => {
-                let cardClass = '';
-                if (i < state.currentEx) cardClass = 'done';
-                else if (i === state.currentEx) cardClass = 'active';
-                else cardClass = 'future';
-                
+            for (let i = 0; i < totalEx; i++) {
+                const ex = state.exercises[i];
+                const isDone = ex.sets.every(s => s !== null);
                 const isCurrent = i === state.currentEx;
-                const showUndo = isCurrent && canUndo && !isTimerRunning;
+                const isFuture = i > state.currentEx;
                 
-                return `
-                    <div class="card ${cardClass}" style="z-index: ${10 - i}; top: ${i * 8}px;">
-                        <h3>${ex.name}</h3>
-                        ${isCurrent ? `
-                            <div class="controls">
-                                <button onclick="changeW(-2.5)">- 2.5</button>
-                                <span>${ex.weight.toFixed(1)} kg</span>
-                                <button onclick="changeW(2.5)">+ 2.5</button>
-                            </div>
-                            <p class="info">Подход: ${sets + 1}/4 | Повторы: 10-12</p>
-                            <button id="main-btn" onclick="nextAction()" ${isTimerRunning ? 'disabled' : ''}>
-                                ${btnText}
-                            </button>
-                            ${showUndo ? `<button class="undo-btn" onclick="undoAction()">ОТМЕНИТЬ ПОДХОД</button>` : ''}
-                        ` : `
-                            <p class="info">Подходы: ${ex.setsDone}/4</p>
-                            <p class="info">Вес: ${ex.weight.toFixed(1)} kg</p>
-                        `}
-                    </div>
-                `;
-            }).join('');
+                if (isDone) continue; // done exercises go to bottom rows
+                
+                let cardClass = '';
+                let style = '';
+                
+                if (isCurrent) {
+                    cardClass = 'active';
+                    style = 'z-index: 10;';
+                } else if (isFuture) {
+                    cardClass = 'peek';
+                    const offset = (i - state.currentEx) * 55;
+                    style = `z-index: ${10 - i}; transform: translateY(${offset}px) scale(0.96);`;
+                }
+                
+                html += renderCard(ex, i, cardClass, style, isCurrent);
+            }
+            
+            stack.innerHTML = html;
         }
         
-        function formatTime(seconds) {
-            const m = Math.floor(seconds / 60);
-            const s = seconds % 60;
-            return `${m}:${s < 10 ? '0'+s : s}`;
+        function renderCard(ex, index, cardClass, style, isCurrent) {
+            if (!isCurrent) {
+                return `
+                    <div class="card ${cardClass}" style="${style}">
+                        <div class="card-content">
+                            <div class="card-header">
+                                <div class="exercise-icon">💪</div>
+                                <h3>${ex.name}</h3>
+                            </div>
+                        </div>
+                        <div class="peek-title">${ex.name}</div>
+                    </div>
+                `;
+            }
+            
+            const setsHtml = ex.sets.map((s, i) => {
+                const isDone = s !== null;
+                const isWeight = i % 2 === 0; // alternate weight/reps? No, let's do weight for all for simplicity
+                // Actually from sketch: row 1 = [50kg][10reps][✓], row 2 = [-][50kg][+], etc
+                // Let's do: each row has weight controls and a check
+                
+                const showControls = !isDone && i === ex.sets.filter(x => x !== null).length;
+                const rowNum = i + 1;
+                
+                if (isDone) {
+                    return `
+                        <div class="set-row">
+                            <span class="set-num">${rowNum}</span>
+                            <div class="set-inputs">
+                                <div class="set-value">${ex.weight.toFixed(1)} кг</div>
+                            </div>
+                            <div class="set-check done">✓</div>
+                        </div>
+                    `;
+                } else if (showControls) {
+                    return `
+                        <div class="set-row">
+                            <span class="set-num">${rowNum}</span>
+                            <div class="set-inputs">
+                                <button class="set-btn" onclick="changeW(-2.5)">-</button>
+                                <div class="set-value">${ex.weight.toFixed(1)} кг</div>
+                                <button class="set-btn" onclick="changeW(2.5)">+</button>
+                            </div>
+                            <div class="set-check empty"></div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="set-row">
+                            <span class="set-num">${rowNum}</span>
+                            <div class="set-inputs">
+                                <div class="set-value" style="opacity:0.3">—</div>
+                            </div>
+                            <div class="set-check empty"></div>
+                        </div>
+                    `;
+                }
+            }).join('');
+            
+            const allDone = ex.sets.every(s => s !== null);
+            const btnText = allDone ? 'ЗАВЕРШИТЬ УПРАЖНЕНИЕ' : 'ЗАВЕРШИТЬ ПОДХОД';
+            
+            return `
+                <div class="card ${cardClass}" style="${style}">
+                    <div class="bookmark"></div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <div class="exercise-icon">💪</div>
+                            <h3>${ex.name}</h3>
+                        </div>
+                        <div class="sets-list">
+                            ${setsHtml}
+                        </div>
+                        <button class="main-action" id="main-btn" onclick="completeSet()">
+                            ${btnText}
+                        </button>
+                    </div>
+                    <div class="peek-title">${ex.name}</div>
+                </div>
+            `;
         }
         
         // ===================== ACTIONS =====================
         function changeW(delta) {
-            if (isTimerRunning) return;
             const ex = state.exercises[state.currentEx];
             ex.weight = Math.max(0, ex.weight + delta);
             saveState();
             render();
         }
         
-        function nextAction() {
-            if (isTimerRunning) return;
-            
+        function completeSet() {
             const ex = state.exercises[state.currentEx];
-            const wasSets = ex.setsDone;
+            const setIndex = ex.sets.findIndex(s => s === null);
+            if (setIndex === -1) return;
             
-            ex.setsDone++;
-            lastAction = (ex.setsDone === 4) ? 'exercise' : 'set';
-            
-            // Enable undo for 5 seconds
+            ex.sets[setIndex] = ex.weight;
+            lastAction = { exIndex: state.currentEx, setIndex };
             canUndo = true;
-            if (undoTimeoutId) clearTimeout(undoTimeoutId);
-            undoTimeoutId = setTimeout(() => {
-                canUndo = false;
-                render();
-            }, 5000);
             
-            // Determine timer duration
-            let duration = 60; // default between sets
-            if (ex.setsDone === 4) {
-                duration = 180; // 3 min after exercise
-            }
-            
-            // If exercise completed, advance
-            if (ex.setsDone === 4) {
-                state.currentEx++;
-            }
+            const isLastSet = ex.sets.every(s => s !== null);
+            const duration = isLastSet ? 180 : 60;
             
             saveState();
-            
-            // Start timer
             startTimer(duration);
         }
         
         function startTimer(duration) {
             isTimerRunning = true;
             timeLeft = duration;
-            render();
+            totalTime = duration;
+            
+            const overlay = document.getElementById('timer-overlay');
+            const display = document.getElementById('timer-display');
+            const circle = document.getElementById('timer-circle');
+            const undoBtn = document.getElementById('undo-timer-btn');
+            
+            overlay.classList.add('show');
+            undoBtn.style.display = 'block';
+            
+            const circumference = 2 * Math.PI * 100; // r=100
+            circle.style.strokeDasharray = circumference;
+            
+            display.textContent = duration;
             
             timerId = setInterval(() => {
                 timeLeft--;
+                display.textContent = timeLeft;
                 
-                // Update button text without full re-render
-                const btn = document.getElementById('main-btn');
-                if (btn) btn.innerText = `ОТДЫХ: ${formatTime(timeLeft)}`;
+                const offset = circumference - (timeLeft / totalTime) * circumference;
+                circle.style.strokeDashoffset = offset;
+                
+                // Hide undo after 5 seconds
+                if (totalTime - timeLeft >= 5) {
+                    undoBtn.style.display = 'none';
+                    canUndo = false;
+                }
                 
                 if (timeLeft <= 0) {
                     clearInterval(timerId);
                     timerId = null;
                     isTimerRunning = false;
                     canUndo = false;
-                    if (undoTimeoutId) {
-                        clearTimeout(undoTimeoutId);
-                        undoTimeoutId = null;
+                    overlay.classList.remove('show');
+                    
+                    // Check if exercise completed
+                    const ex = state.exercises[state.currentEx];
+                    if (ex.sets.every(s => s !== null)) {
+                        state.currentEx++;
+                        saveState();
                     }
+                    
                     render();
                 }
             }, 1000);
         }
         
-        function undoAction() {
-            if (!canUndo || isTimerRunning) return;
+        function undoFromTimer() {
+            if (!canUndo || !lastAction) return;
             
-            const exIndex = lastAction === 'exercise' ? state.currentEx - 1 : state.currentEx;
-            if (exIndex < 0) return;
-            
-            const ex = state.exercises[exIndex];
-            
-            if (lastAction === 'exercise') {
-                // Rollback exercise completion
-                state.currentEx--;
-                ex.setsDone = 3;
-            } else {
-                // Rollback set
-                ex.setsDone = Math.max(0, ex.setsDone - 1);
-            }
-            
+            clearInterval(timerId);
+            timerId = null;
+            isTimerRunning = false;
             canUndo = false;
-            if (undoTimeoutId) {
-                clearTimeout(undoTimeoutId);
-                undoTimeoutId = null;
-            }
             
-            // Stop timer if running
-            if (timerId) {
-                clearInterval(timerId);
-                timerId = null;
-                isTimerRunning = false;
-                timeLeft = 0;
-            }
+            const ex = state.exercises[lastAction.exIndex];
+            ex.sets[lastAction.setIndex] = null;
             
+            document.getElementById('timer-overlay').classList.remove('show');
             saveState();
             render();
         }
@@ -539,18 +954,17 @@ html = '''<!DOCTYPE html>
             saveState();
             
             const legendary = document.getElementById('legendary');
-            const nextDayText = document.getElementById('next-day-text');
+            const nextText = document.getElementById('next-unlock-text');
             const unlock = getUnlockTime();
             
             if (unlock) {
-                nextDayText.textContent = `Следующая тренировка доступна с ${unlock.toLocaleString('ru-RU', {day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit'})}`;
+                nextText.textContent = `Следующий день: ${unlock.toLocaleString('ru-RU', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'})}`;
             }
             
             legendary.classList.add('show');
-            document.getElementById('stack').innerHTML = '';
         }
         
-        // ===================== RESET (DEMO) =====================
+        // ===================== RESET =====================
         function resetApp() {
             localStorage.removeItem(STORAGE_KEY);
             location.reload();
@@ -558,19 +972,17 @@ html = '''<!DOCTYPE html>
         
         // ===================== INIT =====================
         function init() {
-            // Check lock
             if (isWorkoutLocked() && !state.isFinished) {
                 const locked = document.getElementById('locked');
-                const reason = document.getElementById('locked-reason');
+                const timeEl = document.getElementById('unlock-time');
                 const unlock = getUnlockTime();
-                reason.textContent = `Следующая тренировка доступна после 06:00 (${unlock.toLocaleString('ru-RU')})`;
+                timeEl.textContent = unlock.toLocaleString('ru-RU');
                 locked.classList.add('show');
                 return;
             }
             
-            // If was finished but unlocked now, reset for new day
             if (state.isFinished && !isWorkoutLocked()) {
-                state.exercises.forEach(e => e.setsDone = 0);
+                state.exercises = JSON.parse(JSON.stringify(DEFAULT_EXERCISES));
                 state.currentEx = 0;
                 state.isFinished = false;
                 saveState();
@@ -583,8 +995,3 @@ html = '''<!DOCTYPE html>
     </script>
 </body>
 </html>'''
-
-with open('/mnt/agents/output/push_day_aman.html', 'w', encoding='utf-8') as f:
-    f.write(html)
-
-print("Saved successfully!")
