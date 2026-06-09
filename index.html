@@ -1,11 +1,27 @@
-'''<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PUSH DAY">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="description" content="PUSH DAY AMAN - Legendary Workout Tracker">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon.png">
+    
     <title>PUSH DAY AMAN</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body {
             margin: 0;
@@ -15,9 +31,12 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            min-height: 100dvh;
             overflow-x: hidden;
             position: relative;
             background: #0a0a0f;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         body::before {
@@ -245,6 +264,8 @@
             justify-content: center;
             transition: all 0.2s;
             flex-shrink: 0;
+            -webkit-touch-callout: none;
+            user-select: none;
         }
         
         .set-btn:active {
@@ -301,10 +322,12 @@
             cursor: pointer;
             letter-spacing: 1px;
             transition: all 0.3s;
+            -webkit-touch-callout: none;
+            user-select: none;
         }
         
-        .main-action:hover:not(:disabled) {
-            background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(255,255,255,0.1));
+        .main-action:active:not(:disabled) {
+            transform: scale(0.97);
         }
         
         .main-action:disabled {
@@ -319,11 +342,14 @@
             width: 100%; height: 100%;
             background: rgba(0,0,0,0.88);
             backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             z-index: 500;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             animation: fadeIn 0.3s ease;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         .timer-overlay.show {
@@ -407,6 +433,12 @@
             letter-spacing: 1px;
             box-shadow: 0 4px 20px rgba(255,71,87,0.3);
             animation: slideUp 0.3s ease;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+        
+        .undo-timer-btn:active {
+            transform: scale(0.97);
         }
         
         @keyframes slideUp {
@@ -434,6 +466,7 @@
             border-radius: 16px;
             animation: slideIn 0.4s ease;
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
         
         .completed-row .name {
@@ -479,6 +512,8 @@
             align-items: center;
             justify-content: center;
             animation: fadeIn 0.5s ease;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         #legendary.show {
@@ -577,6 +612,8 @@
             justify-content: center;
             padding: 40px;
             text-align: center;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
         
         .locked.show {
@@ -615,6 +652,12 @@
             font-size: 0.9rem;
             cursor: pointer;
             opacity: 0.5;
+            -webkit-touch-callout: none;
+            user-select: none;
+        }
+        
+        .demo-reset:active {
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -775,7 +818,6 @@
             const completed = document.getElementById('completed');
             const dots = document.getElementById('day-dots');
             
-            // Dots: completed = green, current = active green, future = gray
             dots.innerHTML = state.dayProgress.map((done, i) => {
                 let cls = 'dot';
                 if (done) cls += ' completed';
@@ -783,7 +825,6 @@
                 return `<div class="${cls}"></div>`;
             }).join('');
             
-            // Completed rows
             const doneExercises = state.exercises.filter((ex, i) => i < state.currentEx);
             completed.innerHTML = doneExercises.map(ex => `
                 <div class="completed-row">
@@ -795,7 +836,6 @@
                 </div>
             `).join('');
             
-            // Stack
             if (state.currentEx >= state.exercises.length) {
                 finishDay();
                 return;
@@ -870,9 +910,9 @@
                         <div class="set-row">
                             <span class="set-num">${rowNum}</span>
                             <div class="set-inputs">
-                                <button class="set-btn" onclick="changeW(-2.5)">-</button>
+                                <button class="set-btn" ontouchstart="changeW(-2.5)" onclick="changeW(-2.5)">-</button>
                                 <div class="set-value">${ex.weight.toFixed(1)} кг</div>
-                                <button class="set-btn" onclick="changeW(2.5)">+</button>
+                                <button class="set-btn" ontouchstart="changeW(2.5)" onclick="changeW(2.5)">+</button>
                             </div>
                             <div class="set-check empty"></div>
                         </div>
@@ -904,7 +944,7 @@
                         <div class="sets-list">
                             ${setsHtml}
                         </div>
-                        <button class="main-action" id="main-btn" onclick="completeSet()">
+                        <button class="main-action" id="main-btn" ontouchstart="completeSet()" onclick="completeSet()">
                             ${btnText}
                         </button>
                     </div>
@@ -915,6 +955,7 @@
         
         // ===================== ACTIONS =====================
         function changeW(delta) {
+            if (isTimerRunning) return;
             const ex = state.exercises[state.currentEx];
             ex.weight = Math.max(0, ex.weight + delta);
             saveState();
@@ -922,6 +963,8 @@
         }
         
         function completeSet() {
+            if (isTimerRunning) return;
+            
             const ex = state.exercises[state.currentEx];
             const setIndex = ex.sets.findIndex(s => s === null);
             if (setIndex === -1) return;
@@ -1069,4 +1112,4 @@
         init();
     </script>
 </body>
-</html>'''
+</html>
