@@ -2,76 +2,71 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PUSH DAY AMAN</title>
     <style>
-        body { margin: 0; background: #0a0a0a; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80'); background-size: cover; }
-        .glass-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 25px; padding: 25px; width: 90%; max-width: 400px; margin-top: 30px; }
-        .controls { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 15px; margin: 10px 0; }
-        button { background: #00d4ff; border: none; padding: 10px 15px; border-radius: 10px; font-weight: bold; cursor: pointer; color: #000; }
-        .btn-set { width: 100%; padding: 15px; background: #00d4ff; border-radius: 10px; font-weight: bold; }
-        .btn-undo { background: #ff4757; color: white; margin-top: 10px; width: 100%; }
-        #timer-display { font-size: 2rem; color: #00d4ff; text-align: center; margin: 15px 0; font-weight: bold; }
+        body { margin: 0; background: #111; color: #fff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80'); background-size: cover; }
+        .stack { position: relative; width: 90%; max-width: 400px; margin-top: 50px; }
+        .card { 
+            position: absolute; top: 0; left: 0; width: 100%; 
+            background: rgba(255,255,255,0.1); backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; 
+            padding: 20px; transition: all 0.5s ease; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        .controls { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin: 15px 0; }
+        button { background: #00d4ff; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .undo-btn { background: #ff4757; margin-top: 10px; color: white; width: 100%; }
+        .done { transform: translateY(20px) scale(0.95); opacity: 0.6; z-index: -1; }
     </style>
 </head>
 <body>
-
-    <div class="glass-card">
-        <h2 id="day-title">PUSH DAY</h2>
-        <div id="ex-area">
-            <h3 id="ex-name">Жим штанги лежа</h3>
-            <div class="controls">
-                <button onclick="changeWeight(-2.5)">- 2.5</button>
-                <span id="weight">50 kg</span>
-                <button onclick="changeWeight(2.5)">+ 2.5</button>
-            </div>
-            <div style="text-align:center; margin:10px;">Подход: <span id="set-num">1</span>/4 | Повторы: 10-12</div>
-            
-            <button id="main-btn" class="btn-set" onclick="finishSet()">ЗАВЕРШИТЬ ПОДХОД</button>
-            <button id="undo-btn" class="btn-undo" style="display:none;" onclick="undoSet()">ОТМЕНИТЬ ПОСЛЕДНЕЕ</button>
-            
-            <div id="timer-display"></div>
-        </div>
-    </div>
+    <h1 id="title">PUSH DAY AMAN</h1>
+    <div class="stack" id="stack"></div>
 
     <script>
+        const exercises = ["Жим штанги лежа", "Жим гантелей сидя", "Брусья"];
+        let currentEx = 0;
+        let sets = 0;
         let weight = 50;
-        let setCounter = 0;
-        let lastSetTime = 0;
 
-        function changeWeight(val) {
-            weight = Math.max(0, weight + val);
-            document.getElementById('weight').innerText = weight + " kg";
+        function render() {
+            const stack = document.getElementById('stack');
+            const btnText = (sets === 3) ? "ЗАВЕРШИТЬ УПРАЖНЕНИЕ" : "ЗАВЕРШИТЬ ПОДХОД";
+            
+            stack.innerHTML = exercises.map((ex, i) => `
+                <div class="card ${i < currentEx ? 'done' : ''}" style="z-index: ${10 - i}">
+                    <h3>${ex}</h3>
+                    <div class="controls">
+                        <button onclick="changeW(-2.5)">- 2.5</button>
+                        <span>${weight} kg</span>
+                        <button onclick="changeW(2.5)">+ 2.5</button>
+                    </div>
+                    <p>Подход: ${sets + 1}/4 | Повторы: 10-12</p>
+                    <button id="main-btn" style="width:100%" onclick="nextSet()">${btnText}</button>
+                    ${sets > 0 ? `<button class="undo-btn" onclick="undoSet()">ОТМЕНИТЬ ПОДХОД</button>` : ''}
+                </div>
+            `).join('');
         }
 
-        function finishSet() {
-            setCounter++;
-            document.getElementById('set-num').innerText = setCounter;
-            document.getElementById('undo-btn').style.display = 'block';
-            
-            let time = (setCounter % 4 === 0) ? 180 : 60;
-            startTimer(time);
+        function changeW(val) {
+            weight = Math.max(0, weight + val);
+            render();
+        }
+
+        function nextSet() {
+            sets++;
+            if (sets === 4) {
+                currentEx++;
+                sets = 0;
+            }
+            render();
         }
 
         function undoSet() {
-            if (setCounter > 0) {
-                setCounter--;
-                document.getElementById('set-num').innerText = setCounter;
-                document.getElementById('undo-btn').style.display = 'none';
-                document.getElementById('timer-display').innerText = "";
-            }
+            sets--;
+            render();
         }
 
-        function startTimer(duration) {
-            const display = document.getElementById('timer-display');
-            let timer = duration;
-            const interval = setInterval(() => {
-                let m = parseInt(timer / 60, 10);
-                let s = parseInt(timer % 60, 10);
-                display.innerText = (m < 10 ? "0"+m : m) + ":" + (s < 10 ? "0"+s : s);
-                if (--timer < 0) { clearInterval(interval); display.innerText = "ГОТОВ!"; }
-            }, 1000);
-        }
+        render();
     </script>
 </body>
 </html>
